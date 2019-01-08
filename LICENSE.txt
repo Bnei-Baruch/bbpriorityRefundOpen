@@ -1,4 +1,4 @@
-Package: info.kabbalah.payment.bbpriorityRefund
+Package: info.kabbalah.payment.bbpriorityRefundOpen
 Copyright (C) 2017, FIXME <FIXME>
 Licensed under the GNU Affero Public License 3.0 (below).
 

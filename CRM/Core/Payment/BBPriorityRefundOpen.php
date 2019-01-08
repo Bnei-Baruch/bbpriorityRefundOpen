@@ -2,18 +2,18 @@
 
 /**
  *
- * @package BBPriorityRefundFree [after Dummy Payment Processor]
+ * @package BBPriorityRefundOpen [after Dummy Payment Processor]
  * @author Gregory Shilin <gshilin@gmail.com>
  */
 
 require_once 'CRM/Core/Payment.php';
 require_once 'includes/PelecardAPI.php';
-require_once 'BBPriorityRefundIPN.php';
+require_once 'BBPriorityRefundOpenIPN.php';
 
 /**
- * BBPriorityRefundFree payment processor
+ * BBPriorityRefundOpen payment processor
  */
-class CRM_Core_Payment_BBPriorityRefundFree extends CRM_Core_Payment
+class CRM_Core_Payment_BBPriorityRefundOpen extends CRM_Core_Payment
 {
     /**
      * mode of operation: live or test
@@ -68,7 +68,7 @@ class CRM_Core_Payment_BBPriorityRefundFree extends CRM_Core_Payment
     {
         $this->_mode = $mode;
         $this->_paymentProcessor = $paymentProcessor;
-        $this->_processorName = 'BB Payment Refund';
+        $this->_processorName = 'BB Payment RefundOpen';
     }
 
     /**
@@ -290,21 +290,6 @@ class CRM_Core_Payment_BBPriorityRefundFree extends CRM_Core_Payment
 
         $amount = +$params["amount"];
 
-        // Is original payment exists and valid?
-        $original = self::getRecord($original_id);
-
-        // fix parameters according to old/new values
-        $record = self::getRecord(+$params['contributionID']);
-
-        // - Move "amount" to cancel_reason (DB)
-        // - Replace "amount" with real amount (DB)
-        $record = self::updateRecord($record['id'], array(
-            'cancel_reason' => $amount,
-            'cancel_date' => $record['receive_date'],
-            'total_amount' => -$original["total_amount"],
-        ));
-        $amount = -$original["total_amount"];
-
         if (array_key_exists('webform_redirect_success', $params)) {
             $returnURL = $params['webform_redirect_success'];
             $cancelURL = $params['webform_redirect_cancel'];
@@ -460,7 +445,7 @@ class CRM_Core_Payment_BBPriorityRefundFree extends CRM_Core_Payment
         // Print the tpl to redirect to Pelecard
         $template = CRM_Core_Smarty::singleton();
         $template->assign('url', $url);
-        print $template->fetch('CRM/Core/Payment/BbpriorityRefund.tpl');
+        print $template->fetch('CRM/Core/Payment/BbpriorityRefundOpen.tpl');
 
         CRM_Utils_System::civiExit();
     }
@@ -468,7 +453,7 @@ class CRM_Core_Payment_BBPriorityRefundFree extends CRM_Core_Payment
     public function handlePaymentNotification()
     {
         $input = $ids = $objects = array();
-        $ipn = new CRM_Core_Payment_BBPriorityRefundIPN();
+        $ipn = new CRM_Core_Payment_BBPriorityRefundOpenIPN();
 
         // load vars in $input, &ids
         $ipn->getInput($input, $ids);
@@ -481,23 +466,18 @@ class CRM_Core_Payment_BBPriorityRefundFree extends CRM_Core_Payment
             'return' => 'id',
         ));
         if (!$ipn->validateResult($this->_paymentProcessor, $input, $ids, $objects, TRUE, $paymentProcessorID)) {
-            // CRM_Core_Error::debug_log_message("bbpriorityRefund Validation failed");
-            echo("bbpriorityRefund Validation failed");
+            // CRM_Core_Error::debug_log_message("bbpriorityRefundOpen Validation failed");
+            echo("bbpriorityRefundOpen Validation failed");
             exit();
         }
 
         if ($ipn->single($input, $ids, $objects, FALSE, FALSE)) {
-            // mark original record as Refunded(7)
-            $this_rec = self::getRecord($input['contributionID']);
-            $orig_rec = self::getRecord($this_rec['cancel_reason']);
-            $record = self::updateRecord($orig_rec['id'], array('contribution_status_id' => 7,));
-
             $returnURL = (new PelecardAPI)->base64_url_decode($input['returnURL']);
 
             // Print the tpl to redirect to success
             $template = CRM_Core_Smarty::singleton();
             $template->assign('url', $returnURL);
-            print $template->fetch('CRM/Core/Payment/BbpriorityRefund.tpl');
+            print $template->fetch('CRM/Core/Payment/BbpriorityRefundOpen.tpl');
 
             CRM_Utils_System::civiExit();
         } else {

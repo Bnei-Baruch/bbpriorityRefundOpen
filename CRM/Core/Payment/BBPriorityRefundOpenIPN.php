@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Core_Payment_BBPriorityRefundIPN extends CRM_Core_Payment_BaseIPN
+class CRM_Core_Payment_BBPriorityRefundOpenIPN extends CRM_Core_Payment_BaseIPN
 {
     CONST BBP_RESPONSE_CODE_ACCEPTED = '000';
     private $_errors;

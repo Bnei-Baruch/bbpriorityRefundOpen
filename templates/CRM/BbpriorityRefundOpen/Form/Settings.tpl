@@ -1,6 +1,6 @@
 <div class="crm-block crm-form-block">
   <table class="form-layout">
-    <tr class="crm-bbpriorityRefund-form-block-ipn_http">
+    <tr class="crm-bbpriorityRefundOpen-form-block-ipn_http">
       <td width="20%">
         {$form.ipn_http.label}
       </td>
@@ -10,7 +10,7 @@
         <span class="description">bbpriorityRefund doesn't support ipn callbacks using SSL shared certificate in multiples websites with a single IP. In that case you must force to use http protocol in ipn callback url</span>
       </td>
     </tr>
-    <tr class="crm-bbpriorityRefund-form-block-merchant_terminal">
+    <tr class="crm-bbpriorityRefundOpen-form-block-merchant_terminal">
       <td width="20%">
         {$form.merchant_terminal.label}
       </td>
@@ -29,7 +29,7 @@
       {/if}
 
       {if $property|strpos:'merchant_terminal_' === 0}
-        <tr class="crm-bbpriorityRefund-form-block-merchant_terminal">
+        <tr class="crm-bbpriorityRefundOpen-form-block-merchant_terminal">
           <td width="20%">
             {$terminal.label}
           </td>

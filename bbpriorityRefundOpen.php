@@ -1,15 +1,15 @@
 <?php
 
-require_once 'bbpriorityRefund.civix.php';
+require_once 'bbpriorityRefundOpen.civix.php';
 
 /**
  * Implements hook_civicrm_config().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
  */
-function bbpriorityRefund_civicrm_config(&$config)
+function bbpriorityRefundOpen_civicrm_config(&$config)
 {
-    _bbpriorityRefund_civix_civicrm_config($config);
+    _bbpriorityRefundOpen_civix_civicrm_config($config);
 }
 
 /**
@@ -17,9 +17,9 @@ function bbpriorityRefund_civicrm_config(&$config)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
  */
-function bbpriorityRefund_civicrm_xmlMenu(&$files)
+function bbpriorityRefundOpen_civicrm_xmlMenu(&$files)
 {
-    _bbpriorityRefund_civix_civicrm_xmlMenu($files);
+    _bbpriorityRefundOpen_civix_civicrm_xmlMenu($files);
 }
 
 /**
@@ -27,14 +27,14 @@ function bbpriorityRefund_civicrm_xmlMenu(&$files)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
-function bbpriorityRefund_civicrm_install()
+function bbpriorityRefundOpen_civicrm_install()
 {
     $params = array(
         'version' => 3,
-        'name' => 'BBPRefund',
-        'title' => 'BB Priority Refund Payment Processor',
-        'description' => 'Register Refund Payment in Priority',
-        'class_name' => 'Payment_BBPriorityRefundFree',
+        'name' => 'BBPRefundOpen',
+        'title' => 'BB Priority RefundOpen Payment Processor',
+        'description' => 'Register RefundOpen Payment in Priority',
+        'class_name' => 'Payment_BBPriorityRefundOpen',
         'billing_mode' => 'notify', // Corresponds to the Processor Type: Form (1), Button (2), Special (3) or Notify (4)
         'user_name_label' => 'User',
         'password_label' => 'Password',
@@ -54,7 +54,7 @@ function bbpriorityRefund_civicrm_install()
     );
 
     civicrm_api('PaymentProcessorType', 'create', $params);
-    _bbpriorityRefund_civix_civicrm_install();
+    _bbpriorityRefundOpen_civix_civicrm_install();
 }
 
 /**
@@ -62,9 +62,9 @@ function bbpriorityRefund_civicrm_install()
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_postInstall
  */
-function bbpriorityRefund_civicrm_postInstall()
+function bbpriorityRefundOpen_civicrm_postInstall()
 {
-    _bbpriorityRefund_civix_civicrm_postInstall();
+    _bbpriorityRefundOpen_civix_civicrm_postInstall();
 }
 
 /**
@@ -72,12 +72,12 @@ function bbpriorityRefund_civicrm_postInstall()
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
  */
-function bbpriorityRefund_civicrm_uninstall()
+function bbpriorityRefundOpen_civicrm_uninstall()
 {
     $params = array(
         'version' => 3,
         'sequential' => 1,
-        'name' => 'BBPRefund',
+        'name' => 'BBPRefundOpen',
     );
     $result = civicrm_api('PaymentProcessorType', 'get', $params);
     if ($result["count"] == 1) {
@@ -89,7 +89,7 @@ function bbpriorityRefund_civicrm_uninstall()
         civicrm_api('PaymentProcessorType', 'delete', $params);
     }
 
-    _bbpriorityRefund_civix_civicrm_uninstall();
+    _bbpriorityRefundOpen_civix_civicrm_uninstall();
 }
 
 /**
@@ -97,9 +97,9 @@ function bbpriorityRefund_civicrm_uninstall()
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
-function bbpriorityRefund_civicrm_enable()
+function bbpriorityRefundOpen_civicrm_enable()
 {
-    _bbpriorityRefund_civix_civicrm_enable();
+    _bbpriorityRefundOpen_civix_civicrm_enable();
 }
 
 /**
@@ -107,9 +107,9 @@ function bbpriorityRefund_civicrm_enable()
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_disable
  */
-function bbpriorityRefund_civicrm_disable()
+function bbpriorityRefundOpen_civicrm_disable()
 {
-    _bbpriorityRefund_civix_civicrm_disable();
+    _bbpriorityRefundOpen_civix_civicrm_disable();
 }
 
 /**
@@ -117,9 +117,9 @@ function bbpriorityRefund_civicrm_disable()
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_upgrade
  */
-function bbpriorityRefund_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL)
+function bbpriorityRefundOpen_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL)
 {
-    return _bbpriorityRefund_civix_civicrm_upgrade($op, $queue);
+    return _bbpriorityRefundOpen_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
@@ -130,9 +130,9 @@ function bbpriorityRefund_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
  */
-function bbpriorityRefund_civicrm_managed(&$entities)
+function bbpriorityRefundOpen_civicrm_managed(&$entities)
 {
-    _bbpriorityRefund_civix_civicrm_managed($entities);
+    _bbpriorityRefundOpen_civix_civicrm_managed($entities);
 }
 
 /**
@@ -144,9 +144,9 @@ function bbpriorityRefund_civicrm_managed(&$entities)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
  */
-function bbpriorityRefund_civicrm_caseTypes(&$caseTypes)
+function bbpriorityRefundOpen_civicrm_caseTypes(&$caseTypes)
 {
-    _bbpriorityRefund_civix_civicrm_caseTypes($caseTypes);
+    _bbpriorityRefundOpen_civix_civicrm_caseTypes($caseTypes);
 }
 
 /**
@@ -159,9 +159,9 @@ function bbpriorityRefund_civicrm_caseTypes(&$caseTypes)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
  */
-function bbpriorityRefund_civicrm_angularModules(&$angularModules)
+function bbpriorityRefundOpen_civicrm_angularModules(&$angularModules)
 {
-    _bbpriorityRefund_civix_civicrm_angularModules($angularModules);
+    _bbpriorityRefundOpen_civix_civicrm_angularModules($angularModules);
 }
 
 /**
@@ -169,9 +169,9 @@ function bbpriorityRefund_civicrm_angularModules(&$angularModules)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
  */
-function bbpriorityRefund_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
+function bbpriorityRefundOpen_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
 {
-    _bbpriorityRefund_civix_civicrm_alterSettingsFolders($metaDataFolders);
+    _bbpriorityRefundOpen_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
 // --- Functions below this ship commented out. Uncomment as required. ---
@@ -181,7 +181,7 @@ function bbpriorityRefund_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
  *
- * function bbpriorityRefund_civicrm_preProcess($formName, &$form) {
+ * function bbpriorityRefundOpen_civicrm_preProcess($formName, &$form) {
  *
  * } // */
 
@@ -190,7 +190,7 @@ function bbpriorityRefund_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
  */
-function bbpriorityRefund_civicrm_navigationMenu(&$menu)
+function bbpriorityRefundOpen_civicrm_navigationMenu(&$menu)
 {
     // The selected access permissions are bad; Do not use it!!!
     return;
@@ -214,7 +214,7 @@ function bbpriorityRefund_civicrm_navigationMenu(&$menu)
         if (empty($menu_items)) {
             $path = implode('/', $page['parent']);
             unset($page['parent']);
-            _bbpriorityRefund_civix_insert_navigation_menu($menu, $path, $page);
+            _bbpriorityRefundOpen_civix_insert_navigation_menu($menu, $path, $page);
         }
     }
 }

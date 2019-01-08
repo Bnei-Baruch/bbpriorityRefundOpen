@@ -10,7 +10,7 @@ require_once 'CRM/Core/Page.php';
 /**
  *
  */
-class CRM_BbpriorityRefund_Page_BBPriorityAdmin extends CRM_Core_Page
+class CRM_BbpriorityRefundOpen_Page_BBPriorityAdmin extends CRM_Core_Page
 {
 
     /**

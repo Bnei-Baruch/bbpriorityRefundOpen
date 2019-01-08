@@ -7,7 +7,7 @@
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
  */
-function _bbpriorityRefund_civix_civicrm_config(&$config = NULL)
+function _bbpriorityRefundOpen_civix_civicrm_config(&$config = NULL)
 {
     static $configured = FALSE;
     if ($configured) {
@@ -37,9 +37,9 @@ function _bbpriorityRefund_civix_civicrm_config(&$config = NULL)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
  */
-function _bbpriorityRefund_civix_civicrm_xmlMenu(&$files)
+function _bbpriorityRefundOpen_civix_civicrm_xmlMenu(&$files)
 {
-    foreach (_bbpriorityRefund_civix_glob(__DIR__ . '/xml/Menu/*.xml') as $file) {
+    foreach (_bbpriorityRefundOpen_civix_glob(__DIR__ . '/xml/Menu/*.xml') as $file) {
         $files[] = $file;
     }
 }
@@ -49,10 +49,10 @@ function _bbpriorityRefund_civix_civicrm_xmlMenu(&$files)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
-function _bbpriorityRefund_civix_civicrm_install()
+function _bbpriorityRefundOpen_civix_civicrm_install()
 {
-    _bbpriorityRefund_civix_civicrm_config();
-    if ($upgrader = _bbpriorityRefund_civix_upgrader()) {
+    _bbpriorityRefundOpen_civix_civicrm_config();
+    if ($upgrader = _bbpriorityRefundOpen_civix_upgrader()) {
         $upgrader->onInstall();
     }
 }
@@ -62,10 +62,10 @@ function _bbpriorityRefund_civix_civicrm_install()
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_postInstall
  */
-function _bbpriorityRefund_civix_civicrm_postInstall()
+function _bbpriorityRefundOpen_civix_civicrm_postInstall()
 {
-    _bbpriorityRefund_civix_civicrm_config();
-    if ($upgrader = _bbpriorityRefund_civix_upgrader()) {
+    _bbpriorityRefundOpen_civix_civicrm_config();
+    if ($upgrader = _bbpriorityRefundOpen_civix_upgrader()) {
         if (is_callable(array($upgrader, 'onPostInstall'))) {
             $upgrader->onPostInstall();
         }
@@ -77,10 +77,10 @@ function _bbpriorityRefund_civix_civicrm_postInstall()
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
  */
-function _bbpriorityRefund_civix_civicrm_uninstall()
+function _bbpriorityRefundOpen_civix_civicrm_uninstall()
 {
-    _bbpriorityRefund_civix_civicrm_config();
-    if ($upgrader = _bbpriorityRefund_civix_upgrader()) {
+    _bbpriorityRefundOpen_civix_civicrm_config();
+    if ($upgrader = _bbpriorityRefundOpen_civix_upgrader()) {
         $upgrader->onUninstall();
     }
 }
@@ -90,10 +90,10 @@ function _bbpriorityRefund_civix_civicrm_uninstall()
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
-function _bbpriorityRefund_civix_civicrm_enable()
+function _bbpriorityRefundOpen_civix_civicrm_enable()
 {
-    _bbpriorityRefund_civix_civicrm_config();
-    if ($upgrader = _bbpriorityRefund_civix_upgrader()) {
+    _bbpriorityRefundOpen_civix_civicrm_config();
+    if ($upgrader = _bbpriorityRefundOpen_civix_upgrader()) {
         if (is_callable(array($upgrader, 'onEnable'))) {
             $upgrader->onEnable();
         }
@@ -106,10 +106,10 @@ function _bbpriorityRefund_civix_civicrm_enable()
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_disable
  * @return mixed
  */
-function _bbpriorityRefund_civix_civicrm_disable()
+function _bbpriorityRefundOpen_civix_civicrm_disable()
 {
-    _bbpriorityRefund_civix_civicrm_config();
-    if ($upgrader = _bbpriorityRefund_civix_upgrader()) {
+    _bbpriorityRefundOpen_civix_civicrm_config();
+    if ($upgrader = _bbpriorityRefundOpen_civix_upgrader()) {
         if (is_callable(array($upgrader, 'onDisable'))) {
             $upgrader->onDisable();
         }
@@ -127,22 +127,22 @@ function _bbpriorityRefund_civix_civicrm_disable()
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_upgrade
  */
-function _bbpriorityRefund_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL)
+function _bbpriorityRefundOpen_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL)
 {
-    if ($upgrader = _bbpriorityRefund_civix_upgrader()) {
+    if ($upgrader = _bbpriorityRefundOpen_civix_upgrader()) {
         return $upgrader->onUpgrade($op, $queue);
     }
 }
 
 /**
- * @return CRM_BbpriorityRefund_Upgrader
+ * @return CRM_BbpriorityRefundOpen_Upgrader
  */
-function _bbpriorityRefund_civix_upgrader()
+function _bbpriorityRefundOpen_civix_upgrader()
 {
-    if (!file_exists(__DIR__ . '/CRM/BbpriorityRefund/Upgrader.php')) {
+    if (!file_exists(__DIR__ . '/CRM/BbpriorityRefundOpen/Upgrader.php')) {
         return NULL;
     } else {
-        return CRM_BbpriorityRefund_Upgrader_Base::instance();
+        return CRM_BbpriorityRefundOpen_Upgrader_Base::instance();
     }
 }
 
@@ -156,7 +156,7 @@ function _bbpriorityRefund_civix_upgrader()
  * @param $pattern string, glob pattern, eg "*.txt"
  * @return array(string)
  */
-function _bbpriorityRefund_civix_find_files($dir, $pattern)
+function _bbpriorityRefundOpen_civix_find_files($dir, $pattern)
 {
     if (is_callable(array('CRM_Utils_File', 'findFiles'))) {
         return CRM_Utils_File::findFiles($dir, $pattern);
@@ -166,7 +166,7 @@ function _bbpriorityRefund_civix_find_files($dir, $pattern)
     $result = array();
     while (!empty($todos)) {
         $subdir = array_shift($todos);
-        foreach (_bbpriorityRefund_civix_glob("$subdir/$pattern") as $match) {
+        foreach (_bbpriorityRefundOpen_civix_glob("$subdir/$pattern") as $match) {
             if (!is_dir($match)) {
                 $result[] = $match;
             }
@@ -192,14 +192,14 @@ function _bbpriorityRefund_civix_find_files($dir, $pattern)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
  */
-function _bbpriorityRefund_civix_civicrm_managed(&$entities)
+function _bbpriorityRefundOpen_civix_civicrm_managed(&$entities)
 {
-    $mgdFiles = _bbpriorityRefund_civix_find_files(__DIR__, '*.mgd.php');
+    $mgdFiles = _bbpriorityRefundOpen_civix_find_files(__DIR__, '*.mgd.php');
     foreach ($mgdFiles as $file) {
         $es = include $file;
         foreach ($es as $e) {
             if (empty($e['module'])) {
-                $e['module'] = 'info.kabbalah.payment.bbpriorityRefund';
+                $e['module'] = 'info.kabbalah.payment.bbpriorityRefundOpen';
             }
             $entities[] = $e;
             if (empty($e['params']['version'])) {
@@ -218,13 +218,13 @@ function _bbpriorityRefund_civix_civicrm_managed(&$entities)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
  */
-function _bbpriorityRefund_civix_civicrm_caseTypes(&$caseTypes)
+function _bbpriorityRefundOpen_civix_civicrm_caseTypes(&$caseTypes)
 {
     if (!is_dir(__DIR__ . '/xml/case')) {
         return;
     }
 
-    foreach (_bbpriorityRefund_civix_glob(__DIR__ . '/xml/case/*.xml') as $file) {
+    foreach (_bbpriorityRefundOpen_civix_glob(__DIR__ . '/xml/case/*.xml') as $file) {
         $name = preg_replace('/\.xml$/', '', basename($file));
         if ($name != CRM_Case_XMLProcessor::mungeCaseType($name)) {
             $errorMessage = sprintf("Case-type file name is malformed (%s vs %s)", $name, CRM_Case_XMLProcessor::mungeCaseType($name));
@@ -232,7 +232,7 @@ function _bbpriorityRefund_civix_civicrm_caseTypes(&$caseTypes)
             // throw new CRM_Core_Exception($errorMessage);
         }
         $caseTypes[$name] = array(
-            'module' => 'info.kabbalah.payment.bbpriorityRefund',
+            'module' => 'info.kabbalah.payment.bbpriorityRefundOpen',
             'name' => $name,
             'file' => $file,
         );
@@ -248,18 +248,18 @@ function _bbpriorityRefund_civix_civicrm_caseTypes(&$caseTypes)
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
  */
-function _bbpriorityRefund_civix_civicrm_angularModules(&$angularModules)
+function _bbpriorityRefundOpen_civix_civicrm_angularModules(&$angularModules)
 {
     if (!is_dir(__DIR__ . '/ang')) {
         return;
     }
 
-    $files = _bbpriorityRefund_civix_glob(__DIR__ . '/ang/*.ang.php');
+    $files = _bbpriorityRefundOpen_civix_glob(__DIR__ . '/ang/*.ang.php');
     foreach ($files as $file) {
         $name = preg_replace(':\.ang\.php$:', '', basename($file));
         $module = include $file;
         if (empty($module['ext'])) {
-            $module['ext'] = 'info.kabbalah.payment.bbpriorityRefund';
+            $module['ext'] = 'info.kabbalah.payment.bbpriorityRefundOpen';
         }
         $angularModules[$name] = $module;
     }
@@ -277,7 +277,7 @@ function _bbpriorityRefund_civix_civicrm_angularModules(&$angularModules)
  * @param string $pattern
  * @return array, possibly empty
  */
-function _bbpriorityRefund_civix_glob($pattern)
+function _bbpriorityRefundOpen_civix_glob($pattern)
 {
     $result = glob($pattern);
     return is_array($result) ? $result : array();
@@ -290,7 +290,7 @@ function _bbpriorityRefund_civix_glob($pattern)
  * @param string $path - path where insertion should happen (ie. Administer/System Settings)
  * @param array $item - menu you need to insert (parent/child attributes will be filled for you)
  */
-function _bbpriorityRefund_civix_insert_navigation_menu(&$menu, $path, $item, $parentId = NULL)
+function _bbpriorityRefundOpen_civix_insert_navigation_menu(&$menu, $path, $item, $parentId = NULL)
 {
     static $navId;
 
@@ -315,7 +315,7 @@ function _bbpriorityRefund_civix_insert_navigation_menu(&$menu, $path, $item, $p
         foreach ($menu as $key => &$entry) {
             if ($entry['attributes']['name'] == $first) {
                 if (!$entry['child']) $entry['child'] = array();
-                $found = _bbpriorityRefund_civix_insert_navigation_menu($entry['child'], implode('/', $path), $item, $key);
+                $found = _bbpriorityRefundOpen_civix_insert_navigation_menu($entry['child'], implode('/', $path), $item, $key);
             }
         }
         return $found;
@@ -325,10 +325,10 @@ function _bbpriorityRefund_civix_insert_navigation_menu(&$menu, $path, $item, $p
 /**
  * (Delegated) Implements hook_civicrm_navigationMenu().
  */
-function _bbpriorityRefund_civix_navigationMenu(&$nodes)
+function _bbpriorityRefundOpen_civix_navigationMenu(&$nodes)
 {
     if (!is_callable(array('CRM_Core_BAO_Navigation', 'fixNavigationMenu'))) {
-        _bbpriorityRefund_civix_fixNavigationMenu($nodes);
+        _bbpriorityRefundOpen_civix_fixNavigationMenu($nodes);
     }
 }
 
@@ -336,7 +336,7 @@ function _bbpriorityRefund_civix_navigationMenu(&$nodes)
  * Given a navigation menu, generate navIDs for any items which are
  * missing them.
  */
-function _bbpriorityRefund_civix_fixNavigationMenu(&$nodes)
+function _bbpriorityRefundOpen_civix_fixNavigationMenu(&$nodes)
 {
     $maxNavID = 1;
     array_walk_recursive($nodes, function ($item, $key) use (&$maxNavID) {
@@ -344,10 +344,10 @@ function _bbpriorityRefund_civix_fixNavigationMenu(&$nodes)
             $maxNavID = max($maxNavID, $item);
         }
     });
-    _bbpriorityRefund_civix_fixNavigationMenuItems($nodes, $maxNavID, NULL);
+    _bbpriorityRefundOpen_civix_fixNavigationMenuItems($nodes, $maxNavID, NULL);
 }
 
-function _bbpriorityRefund_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parentID)
+function _bbpriorityRefundOpen_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parentID)
 {
     $origKeys = array_keys($nodes);
     foreach ($origKeys as $origKey) {
@@ -363,7 +363,7 @@ function _bbpriorityRefund_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $pa
             $origKey = $newKey;
         }
         if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
-            _bbpriorityRefund_civix_fixNavigationMenuItems($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
+            _bbpriorityRefundOpen_civix_fixNavigationMenuItems($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
         }
     }
 }
@@ -373,7 +373,7 @@ function _bbpriorityRefund_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $pa
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
  */
-function _bbpriorityRefund_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
+function _bbpriorityRefundOpen_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
 {
     static $configured = FALSE;
     if ($configured) {
