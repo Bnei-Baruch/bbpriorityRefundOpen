@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<extension key="info.kabbalah.payment.bbpriorityRefund" type="module">
+  <file>bbpriorityRefundFree</file>
+  <name>(BBPR) BB Priority Refund (Free) Payment Processor</name>
+  <description>Register Refund Payment in Priority (for admin)</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Gregory Shilin</author>
+    <email>gshilin@gmail.com</email>
+  </maintainer>
+  <releaseDate>2017-11-12</releaseDate>
+  <version>1.0</version>
+  <develStage>stable</develStage>
+  <compatibility>
+    <ver>4.7</ver>
+  </compatibility>
+  <comments>This is mostly tested module</comments>
+  <civix>
+    <namespace>CRM/BBPriorityRefundFree</namespace>
+  </civix>
+</extension>

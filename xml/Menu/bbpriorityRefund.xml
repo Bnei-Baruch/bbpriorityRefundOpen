@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/BBPriorityAdmin</path>
+    <page_callback>CRM_BbpriorityRefund_Page_BBPriorityAdmin</page_callback>
+    <title>Payments Administration</title>
+    <access_arguments>access CiviContribute</access_arguments>
+  </item>
+</menu>
