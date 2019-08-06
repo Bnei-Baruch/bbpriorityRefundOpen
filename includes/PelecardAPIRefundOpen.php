@@ -71,7 +71,6 @@ class PelecardAPIRefundOpen
         $this->setParameter("SupportedCards", $cards);
         $this->setParameter("MinPayments", 1);
         $this->setParameter("MaxPayments", 12);
-        $this->setParameter("ParamX", 'civicrm-cancel');
         $this->setParameter("ShopXParam", true);
 
         $json = $this->arrayToJson();
