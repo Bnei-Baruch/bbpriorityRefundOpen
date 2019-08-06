@@ -1,6 +1,6 @@
 <?php
 
-class PelecardAPI
+class PelecardAPIRefundOpen
 {
     /******  Array of request data ******/
     var $vars_pay = array();
@@ -163,7 +163,8 @@ class PelecardAPI
         $cardnum = $data['CreditCardNumber'] . '';
         $cardexp = $data['CreditCardExpDate'] . '';
         $amount = $data['DebitTotal'] / 100.00;
-        if ($data['DebitType'] == '51') {
+        // this is REFUND driver
+        if ($amount > 0) {
             $amount = -$amount;
         }
         $installments = $data['TotalPayments'];
