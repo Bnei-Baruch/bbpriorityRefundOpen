@@ -212,6 +212,31 @@ class CRM_Core_Payment_BBPriorityRefundOpen extends CRM_Core_Payment
         return $record;
     }
 
+    static function checkOriginalRecord($original_id, $contact_id)
+    {
+        if ($original_id <= 0) {
+            CRM_Core_Error::fatal(ts('Wrong "Amount"'));
+            exit();
+        }
+        $original = self::getRecord($original_id);
+
+        // - Original payment belongs to the same user
+        if ($original['contact_id'] != $contact_id) {
+            CRM_Core_Error::fatal(ts('Unable to refund contribution that belongs to different user'));
+            exit();
+        }
+        // - original payment is "completed"
+        if ($original['contribution_status'] != 'Completed') {
+            CRM_Core_Error::fatal(ts('Unable to refund incompleted contributions'));
+            exit();
+        }
+
+        // - ??? Did the closing date passed already ???
+        // xxxxxxxxxxx read https://docs.civicrm.org/dev/en/latest/api/custom-data/
+
+        return $original;
+    }
+
     static function updateRecord($id, $values)
     {
         try {
@@ -277,10 +302,6 @@ class CRM_Core_Payment_BBPriorityRefundOpen extends CRM_Core_Payment
               echo static::formatBacktrace(debug_backtrace());
         */
 
-        global $base_url;
-        global $language;
-        $lang = strtoupper($language->language);
-
         $config = CRM_Core_Config::singleton();
 
         if ($component != 'contribute' && $component != 'event') {
@@ -289,29 +310,90 @@ class CRM_Core_Payment_BBPriorityRefundOpen extends CRM_Core_Payment
         }
 
         $amount = +$params["amount"];
+        $contact_id = +$params['contact_id'];
 
-        if (array_key_exists('webform_redirect_success', $params)) {
-            $returnURL = $params['webform_redirect_success'];
-            $cancelURL = $params['webform_redirect_cancel'];
+        // Try to fetch token
+        $token = self::getToken($contact_id);
+
+        list($returnURL, $cancelURL) = self::getURLs($params, $component);
+
+        // First try to pay by token.
+        // If it fails (due to lack of token or payment failure), then redirect user to Pelecard.
+        if ($token != null && self::payByToken($params, $amount, $token)) {
+            // mark refund payment as Completed(1)
+            self::updateRecord(+$params['contributionID'], array('contribution_status_id' => 1,));
+            $url = $returnURL;
         } else {
-            $url = ($component == 'event') ? 'civicrm/event/register' : 'civicrm/contribute/transact';
-            $cancel = ($component == 'event') ? '_qf_Register_display' : '_qf_Main_display';
-            $returnURL = CRM_Utils_System::url($url,
-                "_qf_ThankYou_display=1&qfKey={$params['qfKey']}",
-                TRUE, NULL, FALSE
-            );
-
-            $cancelUrlString = "$cancel=1&cancel=1&qfKey={$params['qfKey']}";
-            if (CRM_Utils_Array::value('is_recur', $params)) {
-                $cancelUrlString .= "&isRecur=1&recurId={$params['contributionRecurID']}&contribId={$params['contributionID']}";
-            }
-
-            $cancelURL = CRM_Utils_System::url(
-                $url,
-                $cancelUrlString,
-                TRUE, NULL, FALSE
-            );
+            // url to redirect to Pelecard
+            $url = self::payByCard($params, $amount, $component, $returnURL, $cancelURL);
         }
+
+        // Print the tpl to redirect to Pelecard
+        $template = CRM_Core_Smarty::singleton();
+        $template->assign('url', $url);
+        print $template->fetch('CRM/Core/Payment/BbpriorityRefundOpen.tpl');
+
+        CRM_Utils_System::civiExit();
+    }
+
+    function payByToken(&$params, $amount, $token): bool
+    {
+        $contributionID = $params['contributionID'];
+        $pelecard = new PelecardAPIRefundOpen;
+        $pelecard->setParameter("terminalNumber", $this->_paymentProcessor["signature"]);
+        $pelecard->setParameter("user", $this->_paymentProcessor["user_name"]);
+        $pelecard->setParameter("password", $this->_paymentProcessor["password"]);
+
+        $pelecard->setParameter("ActionType", 'J4'); // Debit action
+        $pelecard->setParameter("ShopNo", "100");
+        $pelecard->setParameter("token", $token);
+        $pelecard->setParameter("ParamX", 'civicrm-' . $contributionID);
+        $pelecard->setParameter("total", $amount * 100);
+
+        if ($params["currencyID"] == "EUR") {
+            $currency = 978;
+        } elseif ($params["currencyID"] == "USD") {
+            $currency = 2;
+        } else { // ILS -- default
+            $currency = 1;
+        }
+        $pelecard->setParameter("Currency", $currency);
+        $res = $pelecard->singlePayment();
+        if ($res === null) {
+            return false;
+        }
+        // Parse responce data
+        parse_str($res['data'], $data);
+        $pelecardTransactionId = $data['ResultData']['PelecardTransactionId'];
+        $cardnum = $data['ResultData']['CreditCardNumber'];
+        $cardexp = $data['ResultData']['CreditCardExpDate'];
+        $cardtype = $data['ResultData']['CreditCardCompanyIssuer'];
+        $approval = $data['ResultData']['DebitApproveNumber'];
+        // Store all parameters in DB
+        $query_params = array(
+            1 => array($pelecardTransactionId, 'String'),
+            2 => array($contributionID, 'String'),
+            3 => array($cardtype, 'String'),
+            4 => array($cardnum, 'String'),
+            5 => array($cardexp, 'String'),
+            6 => array($amount, 'String'),
+            7 => array('1', 'String'),
+            8 => array($res['data'], 'String'),
+            9 => array($amount, 'String'),
+            10 => array($token, 'String'),
+            11 => array($approval, 'String'),
+        );
+        CRM_Core_DAO::executeQuery(
+            'INSERT INTO civicrm_bb_payment_responses(trxn_id, cid, cardtype, cardnum, cardexp, firstpay, installments, response, amount, token, approval, created_at) 
+                   VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, NOW())', $query_params);
+        return true;
+    }
+
+    function payByCard(&$params, $amount, $component, $returnURL, $cancelURL): string
+    {
+        global $base_url;
+        global $language;
+        $lang = strtoupper($language->language);
 
         $merchantUrlParams = "contactID={$params['contactID']}&contributionID={$params['contributionID']}";
         if ($component == 'event') {
@@ -442,12 +524,38 @@ class CRM_Core_Payment_BBPriorityRefundOpen extends CRM_Core_Payment
             $url = $result[1];
         }
 
-        // Print the tpl to redirect to Pelecard
-        $template = CRM_Core_Smarty::singleton();
-        $template->assign('url', $url);
-        print $template->fetch('CRM/Core/Payment/BbpriorityRefundOpen.tpl');
+        return $url;
+    }
 
-        CRM_Utils_System::civiExit();
+    /**
+     * @return array<string, string>
+     */
+    function getURLs(&$params, $component): array
+    {
+        if (array_key_exists('webform_redirect_success', $params)) {
+            $returnURL = $params['webform_redirect_success'];
+            $cancelURL = $params['webform_redirect_cancel'];
+        } else {
+            $url = ($component == 'event') ? 'civicrm/event/register' : 'civicrm/contribute/transact';
+            $cancel = ($component == 'event') ? '_qf_Register_display' : '_qf_Main_display';
+            $returnURL = CRM_Utils_System::url($url,
+                "_qf_ThankYou_display=1&qfKey={$params['qfKey']}",
+                TRUE, NULL, FALSE
+            );
+
+            $cancelUrlString = "$cancel=1&cancel=1&qfKey={$params['qfKey']}";
+            if (CRM_Utils_Array::value('is_recur', $params)) {
+                $cancelUrlString .= "&isRecur=1&recurId={$params['contributionRecurID']}&contribId={$params['contributionID']}";
+            }
+
+            $cancelURL = CRM_Utils_System::url(
+                $url,
+                $cancelUrlString,
+                TRUE, NULL, FALSE
+            );
+        }
+
+        return array($returnURL, $cancelURL);
     }
 
     public function handlePaymentNotification()
@@ -485,6 +593,24 @@ class CRM_Core_Payment_BBPriorityRefundOpen extends CRM_Core_Payment
             echo("VALIDATION FAILED");
             exit();
         }
+    }
+
+    function getToken($contact_id): ?string
+    {
+        // get token from contact
+        try {
+            $record = civicrm_api3('Contact', 'getsingle', array(
+                'sequential' => 1,
+                'id' => $contact_id,
+                'return' => ["custom_1191"],
+            ));
+        } catch (CiviCRM_API3_Exception $e) {
+            return null;
+        }
+        if ($record['is_error'] == 0 && $record['custom_1191'] != "") {
+            return $record['custom_1191'];
+        }
+        return null;
     }
 
     static function formatAmount($amount, $size, $pad = 0)

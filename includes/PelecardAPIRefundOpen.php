@@ -88,6 +88,50 @@ class PelecardAPIRefundOpen
         }
     }
 
+    /****** Single payment via PeleCard ******/
+    function singlePayment(): ?array
+    {
+        $json = $this->arrayToJson();
+        $this->Services($json, '/DebitRegularType');
+        $code = +$this->getParameter('StatusCode');
+        $error = $this->getParameter('ErrorMessage');
+        if ($code > 0) {
+            echo("Error: " . $error . " (" . $code . ")");
+            return null;
+        }
+        $result = array(
+            'PelecardTransactionId' => $this->getParameter('PelecardTransactionId'),
+            'cardtype' => $this->getParameter('cardtype'),
+            'cardnum' => $this->getParameter('cardnum'),
+            'cardexp' => $this->getParameter('cardexp'),
+            'approval' => $this->getParameter('approval'),
+            'data' => http_build_query($this->vars_pay),
+        );
+        return $result;
+    }
+
+    function Services($params, $action)
+    {
+        $ch = curl_init('https://gateway20.pelecard.biz/services' . $action);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER,
+            array('Content-Type: application/json; charset=UTF-8', 'Content-Length: ' . strlen($params)));
+        $result = curl_exec($ch);
+        if ($result == '0') {
+            $this->vars_pay = [
+                'Error' => array(-1, 'Error')
+            ];
+        } elseif ($result == '1') {
+            $this->vars_pay = [
+                'Identified' => array(0, 'Identified')
+            ];
+        } else {
+            $this->stringToArray($result);
+        }
+    }
+
     function connect($params, $action)
     {
         $ch = curl_init('https://gateway20.pelecard.biz/PaymentGW' . $action);
