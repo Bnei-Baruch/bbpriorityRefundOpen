@@ -222,8 +222,20 @@ class CRM_Core_Payment_BBPriorityRefundOpen extends CRM_Core_Payment
 
         // - Original payment belongs to the same user
         if ($original['contact_id'] != $contact_id) {
-            CRM_Core_Error::fatal(ts('Unable to refund contribution that belongs to different user'));
-            exit();
+            // maybe this is special user?
+            $query = "
+                SELECT count(1) FROM `civicrm_uf_match` cuf
+                JOIN users_roles ur on ur.uid = cuf.uf_id and ur.rid = (select rid from role where name = 'Payment credit')
+                where cuf.contact_id = %1
+            ";
+            $p = array(1 => array($contact_id, 'Integer'));
+            $has_permission = strval(CRM_Core_Dao::singleValueQuery($query, $p));
+            $has_permission = intval($has_permission);
+
+            if ($has_permission == 0) {
+                CRM_Core_Error::fatal(ts('Unable to refund contribution that belongs to a different user'));
+                exit();
+            }
         }
         // - original payment is "completed"
         if ($original['contribution_status'] != 'Completed') {
@@ -321,7 +333,7 @@ class CRM_Core_Payment_BBPriorityRefundOpen extends CRM_Core_Payment
         // If it fails (due to lack of token or payment failure), then redirect user to Pelecard.
         if ($token != null && self::payByToken($params, $amount, $token)) {
             // mark refund payment as Completed(1)
-            self::updateRecord(+$params['contributionID'], array('contribution_status_id' => 1,));
+            self::updateRecord(+$params['contributionID']                 , array('contribution_status_id' => 1,));
             $url = $returnURL;
         } else {
             // url to redirect to Pelecard
@@ -384,8 +396,8 @@ class CRM_Core_Payment_BBPriorityRefundOpen extends CRM_Core_Payment
             11 => array($approval, 'String'),
         );
         CRM_Core_DAO::executeQuery(
-            'INSERT INTO civicrm_bb_payment_responses(trxn_id, cid, cardtype, cardnum, cardexp, firstpay, installments, response, amount, token, approval, created_at) 
-                   VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, NOW())', $query_params);
+            'INSERT INTO civicrm_bb_payment_responses(trxn_id, cid, cardtype, cardnum, cardexp, firstpay, installments, response, amount, token, approval, is_regular, created_at)
+                   VALUES (%1, %2, %3, %4, %5, %6, %7, %8, %9, %10, %11, 1, NOW())', $query_params);
         return true;
     }
 
